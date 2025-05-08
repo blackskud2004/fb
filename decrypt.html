@@ -1,0 +1,40 @@
+```html
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Giải mã thông tin</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+
+<body>
+    <h1>Giải mã dữ liệu từ login_info.txt</h1>
+    <textarea id="encrypted" rows="4" cols="50" placeholder="Dán chuỗi mã hóa từ file login_info.txt"></textarea><br>
+    <input type="text" id="secretKey" placeholder="Nhập khóa bí mật"><br>
+    <button onclick="decryptData()">Giải mã</button>
+    <p id="result"></p>
+
+    <script>
+        function decryptData() {
+            const encrypted = document.getElementById('encrypted').value;
+            const secretKey = document.getElementById('secretKey').value;
+            const resultElement = document.getElementById('result');
+
+            try {
+                const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
+                const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+                if (!decryptedData) {
+                    throw new Error('Không thể giải mã. Kiểm tra chuỗi mã hóa hoặc khóa.');
+                }
+                const parsedData = JSON.parse(decryptedData);
+                resultElement.innerHTML = `Email: ${parsedData.email}<br>Password: ${parsedData.password}<br>Time: ${parsedData.time}`;
+            } catch (error) {
+                resultElement.innerHTML = `Lỗi: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+
+</html>
+```
